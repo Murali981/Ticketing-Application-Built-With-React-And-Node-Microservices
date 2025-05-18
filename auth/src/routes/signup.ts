@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import { RequestValidationError } from "../errors/request-validation-error";
+import { DatabaseConnectionError } from "../errors/database-connection-error";
 
 const router = express.Router();
 
@@ -18,7 +20,14 @@ router.post(
     if (!errors.isEmpty()) {
       // res.status(400).send(errors.array());
       // res.end();
-      throw new Error("Invalid email (or) password");
+      // This is javascript land but not typescript land
+      // const error = new Error("Invalid email (or) password");
+      // error.reasons = errors.array();
+      // throw error;
+      // throw new Error("Invalid email (or) password"); // Whatever error we are throwing from here will be caught
+      //  by the error handler middleware which is in error-handler.ts file where we can access it through err.message property.
+
+      throw new RequestValidationError(errors.array());
     }
 
     const { email, password } = req.body;
@@ -28,7 +37,8 @@ router.post(
     // }
 
     console.log("Creating a user...");
-    throw new Error("Error connecting to the database");
+    // throw new Error("Error connecting to the database");
+    throw new DatabaseConnectionError();
 
     res.send({ msg: "Success" });
   }
