@@ -2,8 +2,9 @@
 // it has to recieve 4 arguments and the order of these arguments are the error, req, res, next
 
 import { NextFunction, Request, Response } from "express";
-import { RequestValidationError } from "../errors/request-validation-error";
-import { DatabaseConnectionError } from "../errors/database-connection-error";
+import { CustomError } from "../errors/custom-error";
+// import { RequestValidationError } from "../errors/request-validation-error";
+// import { DatabaseConnectionError } from "../errors/database-connection-error";
 
 export const errorHandler = (
   err: Error,
@@ -13,32 +14,36 @@ export const errorHandler = (
 ) => {
   //   console.log("Something went wrong", err);
 
-  if (err instanceof RequestValidationError) {
-    // const formattedErrors = err.errors.map((error) => {
-    //   return {
-    //     message: error.msg,
-    //     field: error.param,
-    //   };
-    // });
-    // const formattedErrors = err.errors.map((error) => {
-    //   if (error.type === "field") {
-    //     return { message: error.msg, field: error.path };
-    //   }
-    // });
-    return res.status(err.statusCode).send({ errors: err.serializeErrors() });
-  }
+  //   if (err instanceof RequestValidationError) {
+  //     // const formattedErrors = err.errors.map((error) => {
+  //     //   return {
+  //     //     message: error.msg,
+  //     //     field: error.param,
+  //     //   };
+  //     // });
+  //     // const formattedErrors = err.errors.map((error) => {
+  //     //   if (error.type === "field") {
+  //     //     return { message: error.msg, field: error.path };
+  //     //   }
+  //     // });
+  //     return res.status(err.statusCode).send({ errors: err.serializeErrors() });
+  //   }
 
-  if (err instanceof DatabaseConnectionError) {
-    // console.log("handling this error as a DB connection error");
-    return res.status(err.statusCode).send({
-      errors:
-        //    [
-        //     {
-        //       message: err.reason,
-        //     },
-        //   ],
-        err.serializeErrors(),
-    });
+  //   if (err instanceof DatabaseConnectionError) {
+  //     // console.log("handling this error as a DB connection error");
+  //     return res.status(err.statusCode).send({
+  //       errors:
+  //         //    [
+  //         //     {
+  //         //       message: err.reason,
+  //         //     },
+  //         //   ],
+  //         err.serializeErrors(),
+  //     });
+  //   }
+
+  if (err instanceof CustomError) {
+    return res.status(err.statusCode).send({ errors: err.serializeErrors() });
   }
 
   res.status(400).send({
