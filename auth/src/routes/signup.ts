@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { RequestValidationError } from "../errors/request-validation-error";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
+import { User } from "../models/user";
+import { BadRequestError } from "../errors/bad-request-error";
 
 const router = express.Router();
 
@@ -14,7 +16,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
   ],
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response): Promise<void> => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -30,17 +32,25 @@ router.post(
       throw new RequestValidationError(errors.array());
     }
 
-    const { email, password } = req.body;
-
     // if (!email || typeof email !== "string") {
     //   res.status(400).send("Provide a valid email address");
     // }
 
-    console.log("Creating a user...");
-    // throw new Error("Error connecting to the database");
-    throw new DatabaseConnectionError();
+    const { email, password } = req.body;
 
-    res.send({ msg: "Success" });
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      // console.log("Email is already in use");
+      // res.status(400).send({ message: "Email is already in use" });
+      // return;
+      throw new BadRequestError("Email in use");
+    }
+
+    const user = User.build({ email, password });
+    await user.save(); // This will save the user into the database.
+
+    res.status(201).send(user);
   }
 );
 
