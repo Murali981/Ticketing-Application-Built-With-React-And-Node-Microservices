@@ -25,16 +25,32 @@ interface UserDoc extends mongoose.Document {
   password: string;
 }
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  {
+    toJSON: {
+      transform(doc, ret) {
+        // doc is the actual user document which is eventually get converted into JSON. We are not going to return
+        // anything here but we are making direct changes to the ret object which is the JSON representation of the document.
+        // This is a function that will be called when we convert the document to JSON.
+        // We are going to remove the password and __v properties from the response.
+        ret.id = ret._id; // We are going to add an id property to the response which is the same as _id property.
+        delete ret._id; // We are going to delete the _id property from the response.
+        delete ret.password; // We are going to delete the password property from the response.
+        delete ret.__v; // We are going to delete the __v property from the response.
+      },
+    },
+  }
+);
 
 userSchema.pre("save", async function (done) {
   // This is a middleware function that runs before saving the document to the database.;

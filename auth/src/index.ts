@@ -1,6 +1,7 @@
 import express from "express";
 import { json } from "body-parser";
 import mongoose from "mongoose";
+import cookieSession from "cookie-session";
 
 import "express-async-errors";
 import { currentUserRouter } from "./routes/current-user";
@@ -12,7 +13,17 @@ import { NotFoundError } from "./errors/not-found-error";
 import { NextFunction, Request, Response } from "express";
 
 const app = express();
+app.set("trust proxy", true); // This is to tell express that we are behind a reverse proxy like nginx or AWS ELB.
+// This is important because we are going to be using cookie-session and we want to make sure that the cookie is secure.
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false, // We are not signing the cookie so that we can read the cookie in the browser.
+    secure: true, // If we are in production then we want to set the secure flag to true.
+    // This means that the cookie will only be sent over HTTPS connections.
+    // In test environment we don't have HTTPS so we set it to false.
+  })
+);
 
 app.use(currentUserRouter);
 app.use(signinRouter);
@@ -87,6 +98,10 @@ app.all("*", async (req, res) => {
 app.use(errorHandler);
 
 const start = async () => {
+  if (!process.env.JWT_KEY) {
+    throw new Error("JWT_KEY must be defined");
+  }
+
   try {
     await mongoose.connect("mongodb://auth-mongo-srv:27017/auth"); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.
