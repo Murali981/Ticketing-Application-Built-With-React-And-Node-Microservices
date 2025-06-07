@@ -1,6 +1,21 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { app } from "../app";
+import request from "supertest";
+
+// declare global {
+//   namespace NodeJS {
+//     interface Global {
+//       signin(): Promise<string[]>; // signin is going to be a function which is going to return a promise and this promise is
+//       // going to resolve itself with a cookie which is an array of strings.
+//     }
+//   }
+// }
+
+declare global {
+  var signin: () => Promise<string[]>; // signin is going to be a function which is going to return a promise and this promise is
+  //       // going to resolve itself with a cookie which is an array of strings.
+}
 
 // Before all our tests start up we are going to create a new instance of the MongoDB memory server. This is going to start up a copy
 // of MongoDB in memory. This is going to allow us to run multiple different test suites at the same time accross different projects. Without
@@ -42,3 +57,28 @@ afterAll(async () => {
   await mongoose.connection.close(); // This is going to close the connection to the MongoDB memory server. We are going to use this to close the connection to the MongoDB memory server after all the tests are done.
 }); // This afterAll function is going to run once after all the tests in this file run. We are not doing anything here right now but we can use this to close the
 // MongoDB memory server connection if we want to. For example, we can use this to close the connection to the MongoDB memory server after all the tests are done.
+
+// In the below we are going to write a Global function inside this file /////////////////////////////////////////////////////
+// This function is going to be assigned to the global scope. So we can very easily use it from all our different test files.
+
+global.signin = async () => {
+  // On the global scope of node.js there is no function called signin (or) no property called signin
+
+  const email = "test@test.com";
+  const password = "password";
+
+  const response = await request(app)
+    .post("/api/users/signup")
+    .send({ email, password })
+    .expect(201);
+
+  const cookie = response.get("Set-Cookie");
+  // Now we want to take out the above cookie and somehow make it really easy to use inside of some follow up request.
+  // There are 2 ways we can do this, First way is simply returning the cookie.
+
+  if (!cookie) {
+    throw new Error("Failed to get the cookie from the response");
+  }
+
+  return cookie;
+};
