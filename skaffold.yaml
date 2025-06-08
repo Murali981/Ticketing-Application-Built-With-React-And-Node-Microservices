@@ -15,6 +15,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: muraliju981108/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.js"
+            dest: .
 
   # - image: us.gcr.io/ticketing-dev-456016/auth
 # apiVersion: skaffold/v4beta3
