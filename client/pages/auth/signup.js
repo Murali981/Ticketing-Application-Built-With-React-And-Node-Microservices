@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Router from "next/router";
 import useRequest from "../../hooks/use-request";
 
 export default () => {
@@ -11,12 +12,13 @@ export default () => {
       email,
       password,
     },
+    onSuccess: () => Router.push("/"),
   });
 
   const onSubmit = async (event) => {
     event.preventDefault(); // The form will not get submitted by default to the browser
 
-    doRequest();
+    await doRequest();
 
     setEmail("");
     setPassword("");
