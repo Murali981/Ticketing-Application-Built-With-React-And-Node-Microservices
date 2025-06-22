@@ -1,8 +1,41 @@
 import "bootstrap/dist/css/bootstrap.css";
+import buildClient from "../api/build-client";
 
-export default ({ Component, pageProps }) => {
-  return <Component {...pageProps} />;
+const AppComponent = ({ Component, pageProps }) => {
+  return (
+    <div>
+      <h1>Header!</h1>
+      <Component {...pageProps} />
+    </div>
+  );
 };
+
+AppComponent.getInitialProps = async (appContext) => {
+  // console.log(Object.keys(appContext)); // This will log the keys of the appContext object to the console
+  // console.log(appContext.ctx.req.headers); // This will log the headers of the request to the console
+  // This is the function that will be called whenever we try to navigate to some distinct page with next.js.
+  // It will be called before the component is rendered.
+  // console.log(appContext.ctx); // This will log the context of the app to the console
+  // console.log(appContext.ctx.Cookie);
+  // console.log(appContext.Component); // This will log the Component that is being rendered to the console
+  const client = buildClient(appContext.ctx); // This will use the buildClient function to create an axios instance
+  const { data } = await client.get("/api/users/currentuser"); // This will get the current user data from the API.
+  // console.log(appContext.ctx); // This will log the context of the app to the console
+  // console.log(appContext.ctx.req.headers); // This will log the headers of the request to the console
+  console.log(data); // This will log the current user data to the console
+  // If you want to log the headers of the request, you can uncomment the line below:
+  return data; // This will return the current user data as props to the AppComponent
+  // If you want to return other props, you can return an object like this:
+  // return { pageProps: { currentUser: data.currentUser } };
+  // If you want to get the initial props of the Component, you can do it like this:
+  // const { Component } = appContext;
+  // This will get the Component that is being rendered
+  // const appProps = await AppComponent.getInitialProps(appContext);
+  // return { ...appProps };
+};
+
+export default AppComponent;
+// This is the _app.js file in Next.js which is used to customize the default App component that wraps all pages.
 
 // Behind the scenes whenever we try to navigate to some distinct page with next.js. Next.js is going to import your component from one
 // of these different files.In our case it can be either banana.js (or) index.js. Next.js does not take just your component and show it on
