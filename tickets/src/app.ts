@@ -7,6 +7,8 @@ import "express-async-errors";
 import { errorHandler, NotFoundError, currentUser } from "@mjtickets981/common";
 import { createTicketRouter } from "./routes/new";
 import { showTicketRouter } from "./routes/show";
+import { indexTicketRouter } from "./routes/index";
+import { updateTicketRouter } from "./routes/update";
 // import { NextFunction, Request, Response } from "express";
 
 const app = express();
@@ -27,6 +29,11 @@ app.use(currentUser); // This is a middleware that will add the current user to 
 
 app.use(createTicketRouter);
 app.use(showTicketRouter);
+app.use(indexTicketRouter);
+app.use(updateTicketRouter);
+
+// This is a catch-all route handler. This will be executed if none of the above routes are matched.
+// So if the user tries to access a route that does not exist then this route handler will be executed.
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();
