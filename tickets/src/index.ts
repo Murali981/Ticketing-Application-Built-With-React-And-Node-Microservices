@@ -8,7 +8,6 @@ const start = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error("MONGO_URI must be defined");
   }
-
   try {
     await mongoose.connect(process.env.MONGO_URI); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.

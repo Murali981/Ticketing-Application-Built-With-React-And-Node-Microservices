@@ -1,16 +1,18 @@
 import "bootstrap/dist/css/bootstrap.css";
 import buildClient from "../api/build-client";
+import Header from "../components/header";
 
-const AppComponent = ({ Component, pageProps }) => {
+const AppComponent = ({ Component, pageProps, currentUser }) => {
   return (
     <div>
-      <h1>Header!</h1>
+      <Header currentUser={currentUser} />
       <Component {...pageProps} />
     </div>
   );
 };
 
 AppComponent.getInitialProps = async (appContext) => {
+  // console.log("App context is", appContext); // This will log the appContext object to the console
   // console.log(Object.keys(appContext)); // This will log the keys of the appContext object to the console
   // console.log(appContext.ctx.req.headers); // This will log the headers of the request to the console
   // This is the function that will be called whenever we try to navigate to some distinct page with next.js.
@@ -22,9 +24,18 @@ AppComponent.getInitialProps = async (appContext) => {
   const { data } = await client.get("/api/users/currentuser"); // This will get the current user data from the API.
   // console.log(appContext.ctx); // This will log the context of the app to the console
   // console.log(appContext.ctx.req.headers); // This will log the headers of the request to the console
-  console.log(data); // This will log the current user data to the console
+  // console.log(data); // This will log the current user data to the console
+  let pageProps = {};
+  if (appContext.Component.getInitialProps) {
+    pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+    console.log("The pageProps are", pageProps); // This will log the pageProps to the console
+  }
   // If you want to log the headers of the request, you can uncomment the line below:
-  return data; // This will return the current user data as props to the AppComponent
+  return {
+    pageProps,
+    currentUser: data.currentUser, // This will return the current user data as props to the AppComponent
+    // If you want to return other props, you can return an object like this:
+  }; // This will return the current user data as props to the AppComponent
   // If you want to return other props, you can return an object like this:
   // return { pageProps: { currentUser: data.currentUser } };
   // If you want to get the initial props of the Component, you can do it like this:

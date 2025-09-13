@@ -23,7 +23,14 @@ build:
         manual:
           - src: "**/*.js"
             dest: .
-
+    - image: muraliju981108/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
   # - image: us.gcr.io/ticketing-dev-456016/auth
 # apiVersion: skaffold/v4beta3
 # kind: Config

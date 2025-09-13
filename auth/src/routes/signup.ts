@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import { RequestValidationError } from "../errors/request-validation-error";
-import { DatabaseConnectionError } from "../errors/database-connection-error";
+// import { RequestValidationError } from "../errors/request-validation-error";
+// import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { User } from "../models/user";
-import { BadRequestError } from "../errors/bad-request-error";
+import { validateRequest, BadRequestError } from "@mjtickets981/common"; // Importing validateRequest and BadRequestError from the common package
+// validateRequest is a middleware that we created to validate the request body using express-validator
 import jwt from "jsonwebtoken"; // Importing jwt to generate a JWT token for the user after signup
-import session from "cookie-session";
-import { validateRequest } from "../middlewares/validate-request";
+// import session from "cookie-session";
 
 const router = express.Router();
 

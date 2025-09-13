@@ -4,11 +4,9 @@ import { json } from "body-parser";
 import cookieSession from "cookie-session";
 
 import "express-async-errors";
-import { currentUserRouter } from "./routes/current-user";
-import { signinRouter } from "./routes/signin";
-import { signupRouter } from "./routes/signup";
-import { signoutRouter } from "./routes/signout";
-import { errorHandler, NotFoundError } from "@mjtickets981/common";
+import { errorHandler, NotFoundError, currentUser } from "@mjtickets981/common";
+import { createTicketRouter } from "./routes/new";
+import { showTicketRouter } from "./routes/show";
 // import { NextFunction, Request, Response } from "express";
 
 const app = express();
@@ -24,10 +22,11 @@ app.use(
   })
 );
 
-app.use(currentUserRouter);
-app.use(signinRouter);
-app.use(signupRouter);
-app.use(signoutRouter);
+app.use(currentUser); // This is a middleware that will add the current user to the request object if the user is authenticated.
+// If the user is not authenticated then it will not add the current user to the request object.
+
+app.use(createTicketRouter);
+app.use(showTicketRouter);
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();

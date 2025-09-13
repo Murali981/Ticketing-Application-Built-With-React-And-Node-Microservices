@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator"; // This body is a method which can be used as a middleware to validate the
-import { validateRequest } from "../middlewares/validate-request";
 import { User } from "../models/user";
-import { BadRequestError } from "../errors/bad-request-error";
+import { validateRequest, BadRequestError } from "@mjtickets981/common"; // Importing validateRequest and BadRequestError from the common package
+// validateRequest is a middleware that we created to validate the request body using express-validator
 import { Password } from "../services/password";
 import jwt from "jsonwebtoken"; // Importing jwt to generate a JWT token for the user after signin
 // We are going to use this jwt to sign the user object and then we are going to set it on the session object.
