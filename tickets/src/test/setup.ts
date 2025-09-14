@@ -92,7 +92,7 @@ global.signin = () => {
   // On the global scope of node.js there is no function called signin (or) no property called signin
   // Build a JWT payload. { id, email }
   const payload = {
-    id: "ssfjsjdf345345", // We can use any string here because we are not going to be actually using this id to look up a user in the database.
+    id: new mongoose.Types.ObjectId().toHexString(), // We can use any string here because we are not going to be actually using this id to look up a user in the database.
     email: "test@test.com",
   };
   // Create the JWT!
