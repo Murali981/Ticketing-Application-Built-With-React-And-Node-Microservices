@@ -1,5 +1,7 @@
 import nats from "node-nats-streaming";
 
+console.clear();
+
 // We are going to create a client which is going to interact with the NATS Streaming Server.
 
 const stan = nats.connect("ticketing", "abc", {
