@@ -26,7 +26,7 @@ stan.on("connect", () => {
   });
 
   // We are going to close the connection after a small delay.
-  setTimeout(() => {
-    stan.close();
-  }, 500);
+  // setTimeout(() => {
+  //   stan.close();
+  // }, 500);
 });
