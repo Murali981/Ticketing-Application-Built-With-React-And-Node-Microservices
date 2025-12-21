@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { app } from "./app";
+import { natswrapper } from "./nats-wrapper";
+import { randomBytes } from "crypto";
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -9,6 +11,27 @@ const start = async () => {
     throw new Error("MONGO_URI must be defined");
   }
   try {
+    await natswrapper.connect(
+      "ticketing",
+      randomBytes(4).toString("hex"),
+      "http://nats-srv:4222"
+    );
+    natswrapper.client.on("close", () => {
+      console.log("NATS connection closed");
+      process.exit(); // Exit the process when NATS connection is closed
+    });
+
+    process.on("SIGINT", () => {
+      natswrapper.client.close();
+    }); // Interrupt signal (Ctrl+C), This is watching for the interrupt signal at anytime when the ts-node-dev tries to restart
+    // our program at anytime when you hit ctrl + C at our terminal. So we are going to intercept this request through this
+    // SIGINT event and then we are going to close the NATS connection before exiting the program.
+
+    process.on("SIGTERM", () => {
+      natswrapper.client.close();
+    }); // Termination signal , This is watching for the termination signal at anytime when the container in which our service is running
+    // is being shutdown. So we are going to intercept this request through this SIGTERM event and then we are going to close
+    // the NATS connection before exiting the program.
     await mongoose.connect(process.env.MONGO_URI); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.
     // auth in /auth is name of the database which is auth that we want to create.

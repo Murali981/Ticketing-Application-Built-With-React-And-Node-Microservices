@@ -22,6 +22,8 @@ declare global {
   var signin: () => string[]; // signin is going to be a function which is going to return a cookie which is an array of strings.
 }
 
+jest.mock("../nats-wrapper"); // This is going to mock the entire nats-wrapper module.
+
 // Before all our tests start up we are going to create a new instance of the MongoDB memory server. This is going to start up a copy
 // of MongoDB in memory. This is going to allow us to run multiple different test suites at the same time accross different projects. Without
 // them all trying to reach out to the same copy of MongoDB. Mongo memory server also gives us direct memory access (or) essentially direct
@@ -40,6 +42,7 @@ beforeAll(async () => {
 }); // This beforeAll function is going to run once before all the tests in this file run. So we are going to use this to start up the MongoDB memory server.
 
 beforeEach(async () => {
+  jest.clearAllMocks(); // This is going to clear all the mocks before each test. We are going to use this to reset the mock implementation of the nats-wrapper module before each test.
   //   const collections = await mongoose.connection.db.collections(); // This is going to get all the collections in the database. We are going to use this to delete all the documents in the database before each test.
   //   for (let collection of collections) {
   //     await collection.deleteMany({}); // This is going to delete all the documents in the collection. We are going to do this for all the collections in the database.

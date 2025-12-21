@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { requireAuth, validateRequest } from "@mjtickets981/common";
 import { Ticket } from "../models/ticket";
+import { TicketCreatedPublisher } from "../events/publishers/ticket-created-publisher";
+import { natswrapper } from "../nats-wrapper";
 
 const router = express.Router();
 router.post(
@@ -22,8 +24,15 @@ router.post(
       price,
       userId: req.currentUser!.id,
     });
-    await ticket.save();
+    await ticket.save(); // Here we are saving the ticket to the database
 
+    // Publish an event saying that a ticket was created
+    new TicketCreatedPublisher(natswrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
     res.status(201).send(ticket);
   }
 );
