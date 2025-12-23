@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: orders
+          image: muraliju981108/orders
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI
+              value: "mongodb://orders-mongo-srv:27017/orders"
+            - name: JWT_KEY # This is going to be the name of the environment variable as it shows up inside of the container
+              # with the image mraliju981108/auth. When we start our Auth application the above name is the property that
+              # is going to be the property set on our environment variables which we are going to access inside of our
+              # Auth application.
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret # This is the name of the secret that we created in the previous step.
+                  key: JWT_KEY # This is the key inside of the secret that we created in the previous step.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-srv
+spec:
+  selector:
+    app: orders
+  ports:
+    - name: orders
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

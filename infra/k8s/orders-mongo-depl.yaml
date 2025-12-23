@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-mongo-depl
+spec:
+  replicas: 1
+  selector: # This selector here is how the deployment is going to find the pods that it actually creates
+    matchLabels:
+      app: orders-mongo
+  template:
+    metadata:
+      labels: # This label is going to be applied to the pod
+        app: orders-mongo
+    spec:
+      containers:
+        - name: orders-mongo
+          image: mongo # This image is coming from a public docker hub which is remotely hosted
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-mongo-srv
+spec:
+  selector: # Remember when we put the selector together inside of a service then it is going to tell which pods it is going to govern access to..
+    app: orders-mongo # Find a set of pods (or) any pod with a label of app: auth-mongo
+  ports:
+    - name: db # The name we put here is just for logging purposes
+      protocol: TCP
+      port: 27017 # By default mongoDB listens for incoming traffic on 27017
+      targetPort: 27017
