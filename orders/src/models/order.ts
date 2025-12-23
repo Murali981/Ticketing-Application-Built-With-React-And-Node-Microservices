@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { OrderStatus } from "@mjtickets981/common";
+import { TicketDoc } from "./ticket";
 
 interface OrderAttrs {
   // These properties are required to create a new Order
