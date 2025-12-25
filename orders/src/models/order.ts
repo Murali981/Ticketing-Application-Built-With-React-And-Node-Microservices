@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { OrderStatus } from "@mjtickets981/common";
 import { TicketDoc } from "./ticket";
 
+export { OrderStatus }; // Re-exporting the OrderStatus enum so that other files can use it.
+
 interface OrderAttrs {
   // These properties are required to create a new Order
   userId: string;
