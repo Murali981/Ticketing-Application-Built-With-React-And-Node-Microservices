@@ -3,6 +3,9 @@ import { app } from "../../app";
 import mongoose from "mongoose";
 import { Ticket } from "../../models/ticket";
 import { Order, OrderStatus } from "../../models/order";
+import { natswrapper } from "../../nats-wrapper"; // Importing the natswrapper to be able to check if the publish method was called.
+// And please remember that we have already mocked the nats-wrapper in the __mocks__ folder. So this will be automatically
+// mocked when we run the tests.
 
 it("returns an error if the ticket does not exist", async () => {
   const ticketId = new mongoose.Types.ObjectId(); // This is going to generate a new valid random MongoDB ObjectId
@@ -50,4 +53,18 @@ it("reserves a ticket", async () => {
     .expect(201); // Here we are expecting a 201 Created response because the ticket is available and not reserved
 });
 
-it.todo("emits an order created event");
+it("emits an order created event", async () => {
+  // We make sure that a ticket is inside the database which is free and not reserved by any other order.
+  const ticket = Ticket.build({
+    title: "concert",
+    price: 20,
+  });
+  await ticket.save();
+  await request(app)
+    .post("/api/orders") // Here we are making a request to create a new order
+    .set("Cookie", global.signin()) // Here we are setting the cookie to simulate an authenticated user
+    .send({ ticketId: ticket.id }) // Here we are sending the ticketId in the request body
+    .expect(201); // Here we are expecting a 201 Created response because the ticket is available and not reserved.
+
+  expect(natswrapper.client.publish).toHaveBeenCalled(); // Here we are checking if the publish method was called on the NATS client
+});
