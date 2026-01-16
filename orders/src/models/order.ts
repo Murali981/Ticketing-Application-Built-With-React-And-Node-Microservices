@@ -62,9 +62,9 @@ const orderSchema = new mongoose.Schema(
   {
     toJSON: {
       transform(doc, ret) {
-        ret.id = ret._id; // Here we are adding an id property to the returned JSON object and setting it to the value of _id.
+        (ret as any).id = ret._id; // Here we are adding an id property to the returned JSON object and setting it to the value of _id.
         // This is a transformation function that modifies the JSON representation of the document.
-        delete ret._id; // Here we are deleting the _id property from the returned JSON object. This is because we want to use id instead of _id.
+        delete (ret as any)._id; // Here we are deleting the _id property from the returned JSON object. This is because we want to use id instead of _id.
       },
     },
   }

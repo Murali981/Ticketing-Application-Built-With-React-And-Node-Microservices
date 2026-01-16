@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { app } from "./app";
 import { natswrapper } from "./nats-wrapper";
+import { TicketCreatedListener } from "./events/listeners/ticket-created-listener";
+import { TicketUpdatedListener } from "./events/listeners/ticket-updated-listener";
 import { randomBytes } from "crypto";
 
 const start = async () => {
@@ -41,6 +43,10 @@ const start = async () => {
     }); // Termination signal , This is watching for the termination signal at anytime when the container in which our service is running
     // is being shutdown. So we are going to intercept this request through this SIGTERM event and then we are going to close
     // the NATS connection before exiting the program.
+
+    new TicketCreatedListener(natswrapper.client).listen(); // Instantiating the TicketCreatedListener class and calling the listen method to start listening for events.
+    new TicketUpdatedListener(natswrapper.client).listen(); // Instantiating the TicketUpdatedListener class and calling the listen method to start listening for events.
+
     await mongoose.connect(process.env.MONGO_URI); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.
     // auth in /auth is name of the database which is auth that we want to create.

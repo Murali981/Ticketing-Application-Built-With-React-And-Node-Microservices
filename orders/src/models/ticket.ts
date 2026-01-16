@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Order, OrderStatus } from "./order";
 
 interface TicketAttrs {
+  id: string;
   title: string;
   price: number;
 }
@@ -35,7 +36,11 @@ const ticketSchema = new mongoose.Schema(
 );
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
+  return new Ticket({
+    _id: attrs.id, // We are setting the _id field to attrs.id because we want to use the same id that we get from the event.
+    title: attrs.title,
+    price: attrs.price,
+  });
 }; // The statics object (or) property is used to add static methods to the model. With the help of
 // statics we can define our own custom static methods on the model. We can directly add the method on the ticket model itself.
 
