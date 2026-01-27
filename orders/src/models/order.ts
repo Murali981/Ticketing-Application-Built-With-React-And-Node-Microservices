@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { OrderStatus } from "@mjtickets981/common";
 import { TicketDoc } from "./ticket";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 export { OrderStatus }; // Re-exporting the OrderStatus enum so that other files can use it.
 
@@ -25,6 +26,7 @@ interface OrderDoc extends mongoose.Document {
   status: OrderStatus;
   expiresAt: Date;
   ticket: TicketDoc;
+  version: number; // Here we are defining the version property which is of type Number.
 }
 
 interface OrderModel extends mongoose.Model<OrderDoc> {
@@ -67,8 +69,11 @@ const orderSchema = new mongoose.Schema(
         delete (ret as any)._id; // Here we are deleting the _id property from the returned JSON object. This is because we want to use id instead of _id.
       },
     },
-  }
+  },
 );
+
+orderSchema.set("versionKey", "version"); // Here we are setting the versionKey to "version" instead of the default "__v" that Mongoose uses.
+orderSchema.plugin(updateIfCurrentPlugin); // Here we are applying the updateIfCurrentPlugin to the orderSchema. This plugin will help us implement optimistic concurrency control.
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   // Here we are adding a static method called build to the orderSchema.
