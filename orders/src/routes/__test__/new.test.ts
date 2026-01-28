@@ -21,6 +21,7 @@ it("returns an error if the ticket is already reserved", async () => {
   // Then we need to create an order for that ticket and save it to the database and make sure that the order and the ticket
   // are associated with each other. Then  we will finally make the request
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });
@@ -42,6 +43,7 @@ it("returns an error if the ticket is already reserved", async () => {
 it("reserves a ticket", async () => {
   // We make sure that a ticket is inside the database which is free and not reserved by any other order.
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });
@@ -56,6 +58,7 @@ it("reserves a ticket", async () => {
 it("emits an order created event", async () => {
   // We make sure that a ticket is inside the database which is free and not reserved by any other order.
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });

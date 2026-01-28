@@ -13,6 +13,8 @@ interface TicketDoc extends mongoose.Document {
   price: number;
   userId: string;
   version: number; // Adding version property to the TicketDoc interface to represent the version number of the document.
+  orderId?: string; // Optional property to store the orderId if the ticket is reserved. Whenever we have first created a ticket
+  // it won't be reserved so orderId will be undefined. But once we reserve the ticket, we will set the orderId property.
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -32,6 +34,9 @@ const ticketSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+    },
+    orderId: {
+      type: String,
     },
   },
   {

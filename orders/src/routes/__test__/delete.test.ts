@@ -5,10 +5,12 @@ import { Order, OrderStatus } from "../../models/order";
 import { natswrapper } from "../../nats-wrapper"; // Importing the natswrapper to be able to check if the publish method was called.
 // And please remember that we have already mocked the nats-wrapper in the __mocks__ folder. So this will be automatically
 // mocked when we run the tests.
+import mongoose from "mongoose";
 
 it("it marks an order as cancelled", async () => {
   // We are going to create a ticket with the ticket model
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });
@@ -36,6 +38,7 @@ it("it marks an order as cancelled", async () => {
 it("emits a order cancelled event", async () => {
   // We are going to create a ticket with the ticket model
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: "concert",
     price: 20,
   });
