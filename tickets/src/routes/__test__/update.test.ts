@@ -2,6 +2,7 @@ import request from "supertest";
 import { app } from "../../app";
 import mongoose from "mongoose";
 import { natswrapper } from "../../nats-wrapper";
+import { Ticket } from "../../models/ticket";
 
 it("It returns a 404 if the ticket is not found", async () => {
   const id = new mongoose.Types.ObjectId().toHexString(); // This is a function to generate a valid mongo object id.
@@ -124,8 +125,7 @@ it("publishes an event", async () => {
     .send({
       title: "asdasd",
       price: 20,
-    })
-    .expect(201);
+    });
 
   await request(app)
     .put(`/api/tickets/${response.body.id}`)
@@ -137,4 +137,32 @@ it("publishes an event", async () => {
     .expect(200);
 
   expect(natswrapper.client.publish).toHaveBeenCalled(); // Here we are checking if the publish method on the natsWrapper.client object was called or not.
+});
+
+it("rejects updates if the ticket is reserved", async () => {
+  const cookie = global.signin();
+  const response = await request(app)
+    .post("/api/tickets")
+    .set("Cookie", cookie)
+    .send({
+      title: "asdasd",
+      price: 20,
+    });
+
+  const ticket = await Ticket.findById(response.body.id); // fetch the ticket that we just created from the database
+  ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() }); // mark the ticket as being reserved by setting its orderId
+  // property to some random value. Why we have added a new mongoose.Types.ObjectId().toHexString() here?
+  // Because orderId is just a string and we need to provide some value to it. So we are generating a new
+  // mongoose object id and converting it to string. What happens if we don't do this?
+  // If we don't do this then the orderId will be undefined and the ticket will not be considered as reserved.
+  await ticket!.save();
+
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    .set("Cookie", cookie)
+    .send({
+      title: "new title",
+      price: 100,
+    })
+    .expect(400);
 });

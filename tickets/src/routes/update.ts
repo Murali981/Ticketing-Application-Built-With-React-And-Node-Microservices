@@ -5,6 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   NotAuthorizedError,
+  BadRequestError,
 } from "@mjtickets981/common";
 import { Ticket } from "../models/ticket";
 import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher";
@@ -27,6 +28,12 @@ router.put(
     if (!ticket) {
       throw new NotFoundError();
     }
+
+    if (ticket.orderId) {
+      // if the ticket is reserved, we cannot edit it
+      throw new BadRequestError("Cannot edit a reserved ticket");
+    }
+
     if (ticket.userId !== req.currentUser!.id) {
       // We are using the non-null assertion operator here because we know for sure that currentUser is defined because we are using the requireAuth middleware before this handler.
       // If the userId of the ticket is not equal to the id of the current user then we are going to throw a NotAuthorizedError
