@@ -39,6 +39,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: muraliju981108/expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
   # - image: us.gcr.io/ticketing-dev-456016/auth
 # apiVersion: skaffold/v4beta3
 # kind: Config
