@@ -3,6 +3,7 @@ import { app } from "./app";
 import { natswrapper } from "./nats-wrapper";
 import { TicketCreatedListener } from "./events/listeners/ticket-created-listener";
 import { TicketUpdatedListener } from "./events/listeners/ticket-updated-listener";
+import { ExpirationCompleteListener } from "./events/listeners/expiration-complete-listener";
 import { randomBytes } from "crypto";
 
 const start = async () => {
@@ -25,7 +26,7 @@ const start = async () => {
     await natswrapper.connect(
       process.env.NATS_CLUSTER_ID,
       process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL
+      process.env.NATS_URL,
     );
     natswrapper.client.on("close", () => {
       console.log("NATS connection closed");
@@ -46,6 +47,7 @@ const start = async () => {
 
     new TicketCreatedListener(natswrapper.client).listen(); // Instantiating the TicketCreatedListener class and calling the listen method to start listening for events.
     new TicketUpdatedListener(natswrapper.client).listen(); // Instantiating the TicketUpdatedListener class and calling the listen method to start listening for events.
+    new ExpirationCompleteListener(natswrapper.client).listen(); // Instantiating the ExpirationCompleteListener class and calling the listen method to start listening for events.
 
     await mongoose.connect(process.env.MONGO_URI); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.

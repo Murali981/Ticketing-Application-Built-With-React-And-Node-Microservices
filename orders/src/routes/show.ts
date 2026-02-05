@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get(
   "/api/orders/:orderId",
-  requireAuth,
+  requireAuth(),
   async (req: Request, res: Response) => {
     const order = await Order.findById(req.params.orderId).populate("ticket"); // When we fetch the order we want to simultaneously fetch the associated ticket as well.
     // So we can use the populate method provided by mongoose to do that.
@@ -23,7 +23,7 @@ router.get(
       throw new NotAuthorizedError();
     }
     res.send(order);
-  }
+  },
 );
 
 export { router as showOrderRouter };

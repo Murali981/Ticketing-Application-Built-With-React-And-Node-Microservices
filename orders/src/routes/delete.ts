@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.delete(
   "/api/orders/:orderId",
-  requireAuth,
+  requireAuth(),
   async (req: Request, res: Response) => {
     // First off all we need to find the order that the user is trying to cancel where we are going to pull it from the
     // req.params.orderId
