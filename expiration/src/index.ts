@@ -1,4 +1,5 @@
 import { natswrapper } from "./nats-wrapper";
+import { OrderCreatedListener } from "./events/listeners/order-created-listener";
 
 const start = async () => {
   if (!process.env.NATS_CLIENT_ID) {
@@ -32,6 +33,8 @@ const start = async () => {
     }); // Termination signal , This is watching for the termination signal at anytime when the container in which our service is running
     // is being shutdown. So we are going to intercept this request through this SIGTERM event and then we are going to close
     // the NATS connection before exiting the program.
+
+    new OrderCreatedListener(natswrapper.client).listen(); // This is how we start listening to the events. We create an instance of the OrderCreatedListener class and then we call the listen method on that instance. This will start listening to the events that are being published to the NATS streaming server.
   } catch (err) {
     console.error(err);
   }
