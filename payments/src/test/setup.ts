@@ -19,7 +19,7 @@ import request from "supertest";
 // }
 
 declare global {
-  var signin: () => string[]; // signin is going to be a function which is going to return a cookie which is an array of strings.
+  var signin: (id?: string) => string[]; // signin is going to be a function which is going to return a cookie which is an array of strings.
 }
 
 jest.mock("../nats-wrapper"); // This is going to mock the entire nats-wrapper module.
@@ -91,11 +91,17 @@ afterAll(async () => {
 //   return cookie;
 // };
 
-global.signin = () => {
+global.signin = (id?: string) => {
   // On the global scope of node.js there is no function called signin (or) no property called signin
   // Build a JWT payload. { id, email }
   const payload = {
-    id: new mongoose.Types.ObjectId().toHexString(), // We can use any string here because we are not going to be actually using this id to look up a user in the database.
+    id: id || new mongoose.Types.ObjectId().toHexString(), // We can use any string here because we are not going to be actually using this id to look up a user in the database.
+    // We are just going to be using this id to sign the JWT token and then we are going to be using this JWT token to authenticate our requests in our tests. So it doesn't matter
+    // what string we use here as long as it's a valid MongoDB ObjectId. In the above line we are
+    // checking if an id is passed in as an argument to the signin function.
+    // If it is, we are going to use that id. If it's not,
+    // we are going to generate a new id using mongoose.Types.ObjectId().toHexString()
+    // which is going to give us a new valid MongoDB ObjectId as a string.
     email: "test@test.com",
   };
   // Create the JWT!

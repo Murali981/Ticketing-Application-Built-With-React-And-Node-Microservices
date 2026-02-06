@@ -34,6 +34,14 @@ spec:
                 secretKeyRef:
                   name: jwt-secret # This is the name of the secret that we created in the previous step.
                   key: JWT_KEY # This is the key inside of the secret that we created in the previous step.
+            - name: STRIPE_KEY # This is going to be the name of the environment variable as it shows up inside of the container
+              # with the image mraliju981108/auth. When we start our Auth application the above name is the property that
+              # is going to be the property set on our environment variables which we are going to access inside of our
+              # Auth application.
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-secret # This is the name of the secret that we created in the previous step.
+                  key: STRIPE_KEY # This is the key inside of the secret that we created in the previous step.
 ---
 apiVersion: v1
 kind: Service

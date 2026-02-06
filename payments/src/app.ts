@@ -5,6 +5,7 @@ import cookieSession from "cookie-session";
 
 import "express-async-errors";
 import { errorHandler, NotFoundError, currentUser } from "@mjtickets981/common";
+import { createChargeRouter } from "./routes/new";
 // import { NextFunction, Request, Response } from "express";
 
 const app = express();
@@ -23,9 +24,10 @@ app.use(
 app.use(currentUser); // This is a middleware that will add the current user to the request object if the user is authenticated.
 // If the user is not authenticated then it will not add the current user to the request object.
 
+app.use(createChargeRouter); // This is to register the createChargeRouter with our Express app. This will allow us to handle requests to /api/payments route.
+
 // This is a catch-all route handler. This will be executed if none of the above routes are matched.
 // So if the user tries to access a route that does not exist then this route handler will be executed.
-
 app.all("*", async (req, res) => {
   throw new NotFoundError();
 }); // As soon as we throw the above NotFoundError() then Express is going to capture this error and send (or) pass it to the
