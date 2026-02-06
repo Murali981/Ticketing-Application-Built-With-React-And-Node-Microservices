@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+    spec:
+      containers:
+        - name: payments
+          image: muraliju981108/payments
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI
+              value: "mongodb://payments-mongo-srv:27017/payments"
+            - name: JWT_KEY # This is going to be the name of the environment variable as it shows up inside of the container
+              # with the image mraliju981108/auth. When we start our Auth application the above name is the property that
+              # is going to be the property set on our environment variables which we are going to access inside of our
+              # Auth application.
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret # This is the name of the secret that we created in the previous step.
+                  key: JWT_KEY # This is the key inside of the secret that we created in the previous step.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-srv
+spec:
+  selector:
+    app: payments
+  ports:
+    - name: payments
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
