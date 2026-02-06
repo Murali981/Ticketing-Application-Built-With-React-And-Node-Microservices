@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { app } from "./app";
 import { natswrapper } from "./nats-wrapper";
+import { OrderCreatedListener } from "./events/listeners/order-created-listener";
+import { OrderCancelledListener } from "./events/listeners/order-cancelled-listener";
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -40,6 +42,15 @@ const start = async () => {
     }); // Termination signal , This is watching for the termination signal at anytime when the container in which our service is running
     // is being shutdown. So we are going to intercept this request through this SIGTERM event and then we are going to close
     // the NATS connection before exiting the program.
+
+    new OrderCreatedListener(natswrapper.client).listen(); // Here we are creating an instance of the OrderCreatedListener class and
+    // then we are calling the listen method on that instance to start listening for the events whenever the application starts.
+    // So whenever the application starts, it will start listening for the events and whenever it receives an event,
+    // it will call the onMessage function of that listener class.
+    new OrderCancelledListener(natswrapper.client).listen(); // Here we are creating an instance of the OrderCancelledListener class and
+    // then we are calling the listen method on that instance to start listening for the events whenever the application starts.
+    // So whenever the application starts, it will start listening for the events and whenever it receives an event,
+    // it will call the onMessage function of that listener class.
 
     await mongoose.connect(process.env.MONGO_URI); // Here we are connecting to the mongoDB instance which is running on another pod. So we have
     // to go through the clusterIP service to connect to the mongoDB instance which is running on that pod.
