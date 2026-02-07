@@ -63,14 +63,52 @@ it("returns a 400 when purchasing a cancelled order", async () => {
     .expect(400);
 });
 
+// it("returns a 201 with a valid inputs", async () => {
+//   const userId = new mongoose.Types.ObjectId().toHexString();
+
+//   const order = Order.build({
+//     id: new mongoose.Types.ObjectId().toHexString(),
+//     userId,
+//     version: 0,
+//     price: 20,
+//     status: OrderStatus.Created,
+//   });
+//   await order.save(); // Save the order to the database.
+
+//   await request(app)
+//     .post("/api/payments")
+//     .set("Cookie", global.signin(userId))
+//     .send({
+//       orderId: order.id,
+//       token: "valid_token",
+//     })
+//     .expect(201);
+
+//   const paymentIntentArgs = (stripe.paymentIntents.create as jest.Mock).mock
+//     .calls[0][0]; // Get the arguments passed to the create method of the mocked Stripe API.
+
+//   // Check that the Stripe API was called with the correct parameters.
+//   // expect(stripe.paymentIntents.create).toHaveBeenCalledWith({
+//   //   amount: 20 * 100, // Stripe expects the amount in cents, so we multiply by 100.
+//   //   currency: "usd",
+//   //   payment_method_types: ["card"],
+//   // });
+
+//   expect(paymentIntentArgs.amount).toEqual(20 * 100); // Check that the amount passed to the Stripe API is correct.
+//   expect(paymentIntentArgs.currency).toEqual("usd"); // Check that the currency passed to the Stripe API is correct.
+//   expect(paymentIntentArgs.payment_method_types).toEqual(["card"]); // Check that the payment method types passed to the Stripe API are correct.
+// });
+
+// In the below test we are making a real API call to Stripe, which is not ideal for testing purposes.
+// This test is making a real API call to Stripe, which can be slow and may have side effects, such as creating real payment intents in your Stripe account.
 it("returns a 201 with a valid inputs", async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-
+  const price = Math.floor(Math.random() * 100000); // Generate a random price for the order.
   const order = Order.build({
     id: new mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
-    price: 20,
+    price: price,
     status: OrderStatus.Created,
   });
   await order.save(); // Save the order to the database.
@@ -84,8 +122,20 @@ it("returns a 201 with a valid inputs", async () => {
     })
     .expect(201);
 
-  const paymentIntentArgs = (stripe.paymentIntents.create as jest.Mock).mock
-    .calls[0][0]; // Get the arguments passed to the create method of the mocked Stripe API.
+  // const paymentIntentArgs = (stripe.paymentIntents.create as jest.Mock).mock
+  //   .calls[0][0]; // Get the arguments passed to the create method of the mocked Stripe API.
+
+  // In the below we will write the code for getting the ten most recent payment intents from Stripe and
+  //  check if the one we just created is among them.
+  const paymentIntents = await stripe.paymentIntents.list({ limit: 50 }); // Get the ten most recent payment intents from Stripe.
+
+  const paymentIntent = paymentIntents.data.find(
+    (pi) => pi.amount === price * 100, // Stripe expects the amount in cents, so we multiply by 100.
+  );
+
+  expect(paymentIntent).toBeDefined(); // Check that the payment intent we just created is among the ten most recent payment intents from Stripe.
+  expect(paymentIntent!.currency).toEqual("usd"); // Check that the currency of the payment intent we just created is correct.
+  expect(paymentIntent!.payment_method_types).toEqual(["card"]); // Check that the payment method types of the payment intent we just created are correct.
 
   // Check that the Stripe API was called with the correct parameters.
   // expect(stripe.paymentIntents.create).toHaveBeenCalledWith({
@@ -94,7 +144,7 @@ it("returns a 201 with a valid inputs", async () => {
   //   payment_method_types: ["card"],
   // });
 
-  expect(paymentIntentArgs.amount).toEqual(20 * 100); // Check that the amount passed to the Stripe API is correct.
-  expect(paymentIntentArgs.currency).toEqual("usd"); // Check that the currency passed to the Stripe API is correct.
-  expect(paymentIntentArgs.payment_method_types).toEqual(["card"]); // Check that the payment method types passed to the Stripe API are correct.
+  // expect(paymentIntentArgs.amount).toEqual(20 * 100); // Check that the amount passed to the Stripe API is correct.
+  // expect(paymentIntentArgs.currency).toEqual("usd"); // Check that the currency passed to the Stripe API is correct.
+  // expect(paymentIntentArgs.payment_method_types).toEqual(["card"]); // Check that the payment method types passed to the Stripe API are correct.
 });

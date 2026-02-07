@@ -24,6 +24,10 @@ declare global {
 
 jest.mock("../nats-wrapper"); // This is going to mock the entire nats-wrapper module.
 
+process.env.STRIPE_KEY =
+  "sk_test_51Q7cTISFEVzUW9BwUjCqtZUrNaow1jFm4JOu8GnyQJo0ECth1cndGCpP7Ip9piQT0m7qaTRBqioxqFDZfJDoGbdg00CBxoC2uV"; // This is going to set
+//  the STRIPE_KEY environment variable. We are going to use this to make requests to the Stripe API in our tests.
+
 // Before all our tests start up we are going to create a new instance of the MongoDB memory server. This is going to start up a copy
 // of MongoDB in memory. This is going to allow us to run multiple different test suites at the same time accross different projects. Without
 // them all trying to reach out to the same copy of MongoDB. Mongo memory server also gives us direct memory access (or) essentially direct
