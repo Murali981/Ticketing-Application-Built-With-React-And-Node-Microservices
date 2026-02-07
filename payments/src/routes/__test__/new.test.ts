@@ -3,6 +3,7 @@ import { app } from "../../app";
 import mongoose from "mongoose";
 import { Order } from "../../models/order";
 import { OrderStatus } from "@mjtickets981/common";
+import { Payment } from "../../models/payment";
 import { stripe } from "../../stripe"; // When we import the stripe module,
 // it will use the mocked version defined in src/__mocks__/stripe.ts, which prevents actual API calls to Stripe during testing.
 
@@ -136,6 +137,15 @@ it("returns a 201 with a valid inputs", async () => {
   expect(paymentIntent).toBeDefined(); // Check that the payment intent we just created is among the ten most recent payment intents from Stripe.
   expect(paymentIntent!.currency).toEqual("usd"); // Check that the currency of the payment intent we just created is correct.
   expect(paymentIntent!.payment_method_types).toEqual(["card"]); // Check that the payment method types of the payment intent we just created are correct.
+
+  const payment = await Payment.findOne({
+    orderId: order.id,
+    stripeId: paymentIntent!.id,
+  }); // Find the payment record in the database that corresponds to the payment intent we just created.
+
+  expect(payment).not.toBeNull(); // Check that the payment record was created in the database.
+  expect(payment!.orderId).toEqual(order.id); // Check that the orderId of the payment record is correct.
+  expect(payment!.stripeId).toEqual(paymentIntent!.id); // Check that the stripeId of the payment record is correct.
 
   // Check that the Stripe API was called with the correct parameters.
   // expect(stripe.paymentIntents.create).toHaveBeenCalledWith({

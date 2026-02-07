@@ -10,6 +10,7 @@ import {
 } from "@mjtickets981/common";
 import { Order } from "../models/order";
 import { stripe } from "../stripe";
+import { Payment } from "../models/payment";
 
 const router = express.Router();
 
@@ -56,6 +57,12 @@ router.post(
     });
 
     // Here you would typically integrate with a payment processing service (e.g., Stripe) to charge the user
+    const payment = Payment.build({
+      orderId: order.id,
+      stripeId: paymentIntent.id,
+    });
+    await payment.save();
+
     res.status(201).send({
       success: true,
       paymentIntentId: paymentIntent.id,
