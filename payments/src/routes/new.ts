@@ -9,12 +9,13 @@ import {
   OrderStatus,
 } from "@mjtickets981/common";
 import { Order } from "../models/order";
+import { stripe } from "../stripe";
 
 const router = express.Router();
 
 router.post(
   "/api/payments",
-  requireAuth,
+  requireAuth(),
   [body("token").not().isEmpty(), body("orderId").not().isEmpty()],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -36,8 +37,29 @@ router.post(
       throw new BadRequestError("Cannot pay for a cancelled order");
     }
 
+    // Use Payment Intents API instead of Charges API
+    // const paymentIntent = await stripe.paymentIntents.create({
+    //   amount: order.price * 100,
+    //   currency: "usd",
+    //   payment_method: token,
+    //   confirm: true,
+    //   automatic_payment_methods: {
+    //     enabled: true,
+    //     allow_redirects: "never",
+    //   },
+    // });
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: order.price * 100,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
+
     // Here you would typically integrate with a payment processing service (e.g., Stripe) to charge the user
-    res.send({ success: true, message: "Payment processed successfully" });
+    res.status(201).send({
+      success: true,
+      paymentIntentId: paymentIntent.id,
+    });
   },
 );
 

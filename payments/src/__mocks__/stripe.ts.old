@@ -1,0 +1,10 @@
+export const stripe = {
+  paymentIntents: {
+    create: jest.fn().mockResolvedValue({ id: "test_payment_intent_id" }), // Mock the create method to return a resolved
+    // promise with a test payment intent ID, Why are returning a resolved promise?
+    // Because the actual Stripe API call is asynchronous, and we want to simulate that behavior in our tests.
+    // By using jest.fn().mockResolvedValue(), we can ensure that when the create method is called in our tests,
+    // it will return a promise that resolves to the specified value (in this case, an object with an id property).
+    // This allows us to test our code without making real API calls to Stripe, which can be slow and may have side effects.
+  },
+};
