@@ -1,10 +1,34 @@
 // import buildClient from "../api/build-client";
+import Link from "next/link";
+const LandingPage = ({ currentUser, tickets }) => {
+  const ticketList = tickets.map((ticket) => {
+    return (
+      <tr key={ticket.id}>
+        <td>{ticket.title}</td>
+        <td>{ticket.price}</td>
+        <td>
+          <Link href={`/tickets/${ticket.id}`} as={`/tickets/${ticket.id}`}>
+            View
+          </Link>
+        </td>
+      </tr>
+    );
+  });
 
-const LandingPage = ({ currentUser }) => {
-  return currentUser ? (
-    <h1>You are signed in</h1>
-  ) : (
-    <h1>You are NOT signed in</h1>
+  return (
+    <div>
+      <h1>Tickets</h1>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>{ticketList}</tbody>
+      </table>
+    </div>
   );
 };
 
@@ -36,7 +60,9 @@ LandingPage.getInitialProps = async (context, client, currentUser) => {
   // const { data } = await client.get("/api/users/currentuser");
   // return data; // This will return the current user data
   // If you want to return other props, you can return an object like this:
-  return {};
+  const { data } = await client.get("/api/tickets");
+
+  return { tickets: data }; // This will return the tickets data as a prop
 };
 
 export default LandingPage;

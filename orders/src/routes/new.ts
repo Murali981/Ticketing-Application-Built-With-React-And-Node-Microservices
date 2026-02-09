@@ -51,7 +51,7 @@ router.post(
     }
     // Calculate an expiration date for this order
     const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS); // Setting the expiration time to 15 minutes from now.
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS); // Setting the expiration time to 1 minute from now.
 
     // Build the order and save it to the database
     const order = Order.build({

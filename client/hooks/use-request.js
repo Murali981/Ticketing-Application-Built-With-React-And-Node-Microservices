@@ -5,10 +5,14 @@ export default ({ url, method, body, onSuccess }) => {
   // method === "POST", "GET", "PUT", "PATCH", "UPDATE".....
   const [errors, setErrors] = useState(null);
 
-  const doRequest = async () => {
+  const doRequest = async (props = {}) => {
     try {
       setErrors(null);
-      const response = await axios[method](url, body);
+      const response = await axios[method](url, { ...body, ...props });
+      // Why we put ... for both body and props?
+      // Because we want to merge the body and props objects into a single object that will be sent as the request body.
+      // This allows us to pass additional data (like token from Stripe) when calling doRequest without having to modify
+      // the original body object.
 
       if (onSuccess) {
         onSuccess(response.data);
@@ -27,7 +31,7 @@ export default ({ url, method, body, onSuccess }) => {
               <li key={err.message}>{err.message}</li>
             ))}
           </ul>
-        </div>
+        </div>,
       );
     }
   };
