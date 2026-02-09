@@ -6,7 +6,9 @@ const AppComponent = ({ Component, pageProps, currentUser }) => {
   return (
     <div>
       <Header currentUser={currentUser} />
-      <Component {...pageProps} />
+      <div className="container">
+        <Component currentUser={currentUser} {...pageProps} />
+      </div>
     </div>
   );
 };
@@ -27,7 +29,11 @@ AppComponent.getInitialProps = async (appContext) => {
   // console.log(data); // This will log the current user data to the console
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
-    pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+    pageProps = await appContext.Component.getInitialProps(
+      appContext.ctx,
+      client, // This will pass the axios instance to the getInitialProps function of the Component that is being rendered
+      data.currentUser, // This will pass the current user data to the getInitialProps function of the Component that is being rendered
+    );
     console.log("The pageProps are", pageProps); // This will log the pageProps to the console
   }
   // If you want to log the headers of the request, you can uncomment the line below:

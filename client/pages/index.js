@@ -1,4 +1,4 @@
-import buildClient from "../api/build-client";
+// import buildClient from "../api/build-client";
 
 const LandingPage = ({ currentUser }) => {
   return currentUser ? (
@@ -28,14 +28,15 @@ const LandingPage = ({ currentUser }) => {
 //   }
 // };
 
-LandingPage.getInitialProps = async (context) => {
-  console.log("LANDING PAGE!");
-  console.log("Context:", context);
-  const client = buildClient(context);
-  // This will use the buildClient function to create an axios instance
-  const { data } = await client.get("/api/users/currentuser");
-  return data; // This will return the current user data
+LandingPage.getInitialProps = async (context, client, currentUser) => {
+  // console.log("LANDING PAGE!");
+  // console.log("Context:", context);
+  // const client = buildClient(context);
+  // // This will use the buildClient function to create an axios instance
+  // const { data } = await client.get("/api/users/currentuser");
+  // return data; // This will return the current user data
   // If you want to return other props, you can return an object like this:
+  return {};
 };
 
 export default LandingPage;
