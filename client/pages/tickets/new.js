@@ -23,20 +23,19 @@ const NewTicket = () => {
   };
 
   const onBlur = () => {
-    const value = parseFloat(price); // Convert the price to a number
+    const value = parseFloat(price);
     if (isNaN(value)) {
-      // If the value is not a number, do not update the price
       return;
     }
 
-    setPrice(value.toFixed(2)); // Convert to a string with 2 decimal places
+    setPrice(value.toFixed(2));
   };
 
   return (
     <div>
       <h1>Create a New Ticket</h1>
       <form onSubmit={onSubmit}>
-        <div className="form-group">
+        <div className="form-group" style={{ marginBottom: "15px" }}>
           <label>Title</label>
           <input
             value={title}
@@ -44,7 +43,7 @@ const NewTicket = () => {
             className="form-control"
           />
         </div>
-        <div className="form-group">
+        <div className="form-group" style={{ marginBottom: "15px" }}>
           <label>Price</label>
           <input
             value={price}
@@ -54,7 +53,9 @@ const NewTicket = () => {
           />
         </div>
         {errors}
-        <button className="btn btn-primary">Submit</button>
+        <button className="btn btn-primary" style={{ marginTop: "20px" }}>
+          Submit
+        </button>
       </form>
     </div>
   );

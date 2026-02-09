@@ -7,7 +7,9 @@ import { NotFoundError } from "@mjtickets981/common";
 const router = express.Router();
 
 router.get("/api/tickets", async (req: Request, res: Response) => {
-  const tickets = await Ticket.find({}); // This empty object means give me all the tickets which are inside this collection.
+  const tickets = await Ticket.find({
+    orderId: undefined,
+  }); // Only return tickets that are not reserved
   res.send(tickets);
 });
 
