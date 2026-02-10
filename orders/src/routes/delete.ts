@@ -40,7 +40,7 @@ router.delete(
       },
     });
 
-    res.send(order);
+    res.status(204).send(order);
   },
 );
 
