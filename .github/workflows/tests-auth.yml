@@ -1,11 +1,14 @@
 name: tests-auth
 
 on:
-  pull_request: 
+  pull_request:
+    paths:
+      - "auth/**" # Only run on changes within the auth directory
+      - ".github/workflows/tests-auth.yml"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: cd auth && npm install && npm run test:ci

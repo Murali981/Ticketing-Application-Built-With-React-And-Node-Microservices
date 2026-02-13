@@ -1,7 +1,10 @@
 name: tests-orders
 
 on:
-  pull_request: 
+  pull_request:
+    paths:
+      - "orders/**" # Only run on changes within the orders directory
+      - ".github/workflows/tests-orders.yml"
 
 jobs:
   build:

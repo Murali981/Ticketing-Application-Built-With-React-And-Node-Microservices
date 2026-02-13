@@ -1,7 +1,10 @@
 name: tests-tickets
 
 on:
-  pull_request: 
+  pull_request:
+    paths:
+      - "tickets/**" # Only run on changes within the tickets directory
+      - ".github/workflows/tests-tickets.yml"
 
 jobs:
   build:
